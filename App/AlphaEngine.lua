@@ -54,7 +54,7 @@ function Engine:Install_Library(Installed_Environment)
 			Parent = game
 		}
 	);
-
+	
 	local Http_ModuleList = Http:JSONDecode(Http:GetAsync(RawRepository..Repository..ModuleList, false));
 	for moduleIndex, moduleDirectory in next, Http_ModuleList do
 		local Source = RawRepository..Repository..'/master/Modules'..moduleDirectory;
@@ -67,7 +67,14 @@ function Engine:Install_Library(Installed_Environment)
 					Name = moduleDirectory:sub(2),
 					Parent = PhysicalLibrary, 
 					Archivable = true,
-					Source = Http:GetAsync(Source, false);
+					Source = (function() 
+						if (SourceValid(Source) == true) then
+							return Http:GetAsync(Source, false); 
+						else
+							print('A source cannot be found for: '..moduleDirectory);
+							return 'return {}';
+						end;
+					end)()
 				}
 			);
 		else
@@ -97,7 +104,14 @@ function Engine:Install_Library(Installed_Environment)
 								Name = moduleDirectory:sub(directoryName:len() + directoryName2:len() + 1 + 3),
 								Parent = Folder2,
 								Archivable = true,
-								Source = Http:GetAsync(Source, false);
+								Source = (function() 
+									if (SourceValid(Source) == true) then
+										return Http:GetAsync(Source, false); 
+									else
+										print('A source cannot be found for: '..moduleDirectory:sub(directoryName:len() + directoryName2:len() + 1 + 3));
+										return 'return {}';
+									end;
+								end)();
 							}
 						);
 					else
@@ -107,7 +121,14 @@ function Engine:Install_Library(Installed_Environment)
 								Name = moduleDirectory:sub(directoryName:len() + directoryName2:len() + 1 + 3),
 								Parent = PhysicalLibrary[directoryName]:FindFirstChild(directoryName2),
 								Archivable = true,
-								Source = Http:GetAsync(Source, false);
+								Source = (function() 
+									if (SourceValid(Source) == true) then
+										return Http:GetAsync(Source, false); 
+									else
+										print('A source cannot be found for: '..moduleDirectory:sub(directoryName:len() + directoryName2:len() + 1 + 3));
+										return 'return {}';
+									end;
+								end)();
 							}
 						);
 					end;
@@ -118,7 +139,14 @@ function Engine:Install_Library(Installed_Environment)
 							Name = moduleDirectory:sub(directoryName:len() + 3),
 							Parent = PhysicalLibrary:FindFirstChild(directoryName),
 							Archivable = true,
-							Source = Http:GetAsync(Source, false);
+							Source = (function() 
+								if (SourceValid(Source) == true) then
+									return Http:GetAsync(Source, false); 
+								else
+									print('A source cannot be found for: '..moduleDirectory:sub(directoryName:len() + 3));
+									return 'return {}';
+								end;
+							end)();
 						}
 					);
 				end;
@@ -140,7 +168,14 @@ function Engine:Install_Library(Installed_Environment)
 								Name = moduleDirectory:sub(directoryName:len() + directoryName2:len() + 1 + 3),
 								Parent = Folder1,
 								Archivable = true,
-								Source = Http:GetAsync(Source, false);
+								Source = (function() 
+									if (SourceValid(Source) == true) then
+										return Http:GetAsync(Source, false); 
+									else
+										print('A source cannot be found for: '..moduleDirectory:sub(directoryName:len() + directoryName2:len() + 1 + 3));
+										return 'return {}';
+									end;
+								end)();
 							}
 						);
 					else
@@ -150,7 +185,14 @@ function Engine:Install_Library(Installed_Environment)
 								Name = moduleDirectory:sub(directoryName:len() + directoryName2:len() + 1 + 3),
 								Parent = PhysicalLibrary[directoryName]:FindFirstChild(directoryName2),
 								Archivable = true,
-								Source = Http:GetAsync(Source, false);
+								Source = (function() 
+									if (SourceValid(Source) == true) then
+										return Http:GetAsync(Source, false); 
+									else
+										print('A source cannot be found for: '..moduleDirectory:sub(directoryName:len() + directoryName2:len() + 1 + 3));
+										return 'return {}';
+									end;
+								end)();
 							}
 						);
 					end;
@@ -161,7 +203,14 @@ function Engine:Install_Library(Installed_Environment)
 							Name = moduleDirectory:sub(directoryName:len() + directoryName2:len() + 1 + 3),
 							Parent = PhysicalLibrary:FindFirstChild(directoryName),
 							Archivable = true,
-							Source = Http:GetAsync(Source, false);
+							Source = (function() 
+								if (SourceValid(Source) == true) then
+									return Http:GetAsync(Source, false); 
+								else
+									print('A source cannot be found for: '..moduleDirectory:sub(directoryName:len() + directoryName2:len() + 1 + 3));
+									return 'return {}';
+								end;
+							end)();
 						}
 					);
 				end;
@@ -186,12 +235,29 @@ Engine:AddEnvironmentPage('Create', function(roblox_Classname, roblox_Properties
 	return roblox_Instance;
 end);
 
+Engine:AddEnvironmentPage('SourceValid', function(source)
+	assert(source ~= nil, 'function Engine:AddEnvironmentPage"SourceValid": source is invalid');
+	assert(type(source) == 'string', 'function Engine:AddEnvironmentPage"SourceValid": source is not a string');
+	local Validation = true;
+	local ran, result = ypcall(function()
+		local Source = Http:GetAsync(source, false);
+	end);
+	if (not ran) then
+		result = tostring(result);
+		if (result == 'HTTP 404 (HTTP/1.1 404 Not Found)') then
+			Validation = false;
+		else
+			print('Unknown get: '..result);
+		end;
+	end;
+	return Validation;
+end);
+
 Engine:AddEnvironmentPage('GetDirectory', function(module_Directory)
 	assert(module_Directory ~= nil, 'function Engine:AddEnvironmentPage"GetDirectory": module_Directory is invalid');
 	assert(type(module_Directory) == 'string', 'function Engine:AddEnvironmentPage"GetDirectory": module_Directory is not a string');
 
 	if (module_Directory:sub(1, 1) == '/') then
-		--/haha/json.lua
 		local directoryName = module_Directory:sub(2);
 		local currentSub = 0;
 		local maxSubs = directoryName:len();
@@ -206,7 +272,6 @@ Engine:AddEnvironmentPage('GetDirectory', function(module_Directory)
 		end;
 		return true, directoryName;
 	elseif (string.find(module_Directory, '/') ~= nil) then
-		--haha/json.lua
 		local directoryName = module_Directory;
 		local currentSub = 0;
 		local maxSubs = directoryName:len();
