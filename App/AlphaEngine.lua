@@ -1,12 +1,4 @@
 
---[[
-	[
-		"lol",
-		"lole"
-	]
-	
-	
---]]
 wait();
 local Engine, RepStorage, Http, Environment, Run;
 
@@ -37,6 +29,13 @@ function Engine:Install_Library(Installed_Environment)
 	
 	local ModuleList = '/master/Modules/ModuleList.json';
 	
+	if (RepStorage:FindFirstChild('AlphaLibrary', true) ~= nil) then
+		RepStorage:FindFirstChild('AlphaLibrary', true):Destroy();
+	end;
+	if (game:FindFirstChild'AlphaLibrary' ~= nil) then
+		game['AlphaLibrary']:Destroy();
+	end;
+	
 	local Library = Create(
 		'ModuleScript', 
 		{
@@ -55,49 +54,47 @@ function Engine:Install_Library(Installed_Environment)
 			Parent = game
 		}
 	);
-	
-	for moduleIndex, moduleDirectory in next, Http:JSONDecode(Http:GetAsync(RawRepository..Repository..ModuleList, false)) do
-		spawn(function()
-		local Source = RawRepository..Repository..'/master/'..moduleDirectory;
+
+	local Http_ModuleList = Http:JSONDecode(Http:GetAsync(RawRepository..Repository..ModuleList, false));
+	for moduleIndex, moduleDirectory in next, Http_ModuleList do
+		local Source = RawRepository..Repository..'/master/Modules'..moduleDirectory;
 		local hasDirectory, directoryName = GetDirectory(moduleDirectory);
-		repeat
-			--json.lua
-			if (hasDirectory == false or hasDirectory == nil) then
-				local Module = Create(
-					'ModuleScript',
+		
+		if (hasDirectory == false) then
+			local Module = Create(
+				'ModuleScript',
+				{
+					Name = moduleDirectory:sub(2),
+					Parent = PhysicalLibrary, 
+					Archivable = true,
+					Source = Http:GetAsync(Source, false);
+				}
+			);
+		else
+			local hasDirectory2, directoryName2 = GetDirectory(moduleDirectory:sub(directoryName:len() + 3));
+			if (PhysicalLibrary:FindFirstChild(directoryName) == nil) then
+				local Folder = Create(
+					'Folder',
 					{
-						Name = moduleDirectory,
-						Parent = PhysicalLibrary, --make sure to set parent
-						Archivable = true,
-						Source = Http:GetAsync(Source, false);
+						Name = directoryName,
+						Parent = PhysicalLibrary,
+						Archivable = true
 					}
 				);
-			--/haha/json.lua
-			else
-				--if haha isn't available
-				if (PhysicalLibrary:FindFirstChild(directoryName, false) == nil) then
-					local Folder = Create(
-						'Folder',
-						{
-							Name = directoryName,
-							Parent = PhysicalLibrary,
-							Archivable = true
-						}
-					);
-					local hasDirectory2, directoryName2 = GetDirectory(directoryName);
-					if (hasDirectory == true) then
+				if (hasDirectory2 == true) then
+					if (PhysicalLibrary[directoryName]:FindFirstChild(directoryName2) == nil) then
 						local Folder2 = Create(
 							'Folder',
 							{
 								Name = directoryName2,
-								Parent = Folder,
+								Parent = PhysicalLibrary[directoryName]:FindFirstChild(directoryName2),
 								Archivable = true
 							}
 						);
 						local Module = Create(
 							'ModuleScript',
 							{
-								Name = moduleDirectory,
+								Name = moduleDirectory:sub(directoryName:len() + directoryName2:len() + 1 + 3),
 								Parent = Folder2,
 								Archivable = true,
 								Source = Http:GetAsync(Source, false);
@@ -107,64 +104,69 @@ function Engine:Install_Library(Installed_Environment)
 						local Module = Create(
 							'ModuleScript',
 							{
-								Name = moduleDirectory,
-								Parent = Folder,
+								Name = moduleDirectory:sub(directoryName:len() + directoryName2:len() + 1 + 3),
+								Parent = PhysicalLibrary[directoryName]:FindFirstChild(directoryName2),
 								Archivable = true,
 								Source = Http:GetAsync(Source, false);
 							}
 						);
 					end;
-				--if haha was already made
 				else
-					local hasDirectory2, directoryName2 = GetDirectory(directoryName);
-					if (hasDirectory2 == true) then
-						if (PhysicalLibrary[directoryName]:FindFirstChild(directoryName2) == nil) then
-							local Folder2 = Create(
-								'Folder',
-								{
-									Name = directoryName2,
-									Parent = PhysicalLibrary[directoryName],
-									Archivable = true
-								}
-							);
-							local Module = Create(
-								'ModuleScript',
-								{
-									Name = moduleDirectory,
-									Parent = Folder2,
-									Archivable = true,
-									Source = Http:GetAsync(Source, false);
-								}
-							);
-						else
-							local Module = Create(
-								'ModuleScript',
-								{
-									Name = moduleDirectory,
-									Parent = PhysicalLibrary[directoryName]:FindFirstChild(directoryName2), --make sure to set parent
-									Archivable = true,
-									Source = Http:GetAsync(Source, false);
-								}
-							);
-						end;
+					local Module = Create(
+						'ModuleScript',
+						{
+							Name = moduleDirectory:sub(directoryName:len() + 3),
+							Parent = PhysicalLibrary:FindFirstChild(directoryName),
+							Archivable = true,
+							Source = Http:GetAsync(Source, false);
+						}
+					);
+				end;
+			else
+				if (hasDirectory2 == true) then
+					if (PhysicalLibrary[directoryName]:FindFirstChild(directoryName2) == nil) then
+						local Folder1 = Create(
+							'Folder',
+							{
+								Name = directoryName2,
+								Parent = PhysicalLibrary[directoryName],
+								Archivable = true
+							}
+						);
+						
+						local Module = Create(
+							'ModuleScript',
+							{
+								Name = moduleDirectory:sub(directoryName:len() + directoryName2:len() + 1 + 3),
+								Parent = Folder1,
+								Archivable = true,
+								Source = Http:GetAsync(Source, false);
+							}
+						);
 					else
 						local Module = Create(
 							'ModuleScript',
 							{
-								Name = moduleDirectory,
-								Parent = PhysicalLibrary:FindFirstChild(directoryName), --make sure to set parent
+								Name = moduleDirectory:sub(directoryName:len() + directoryName2:len() + 1 + 3),
+								Parent = PhysicalLibrary[directoryName]:FindFirstChild(directoryName2),
 								Archivable = true,
 								Source = Http:GetAsync(Source, false);
 							}
 						);
 					end;
+				else
+					local Module = Create(
+						'ModuleScript',
+						{
+							Name = moduleDirectory:sub(directoryName:len() + directoryName2:len() + 1 + 3),
+							Parent = PhysicalLibrary:FindFirstChild(directoryName),
+							Archivable = true,
+							Source = Http:GetAsync(Source, false);
+						}
+					);
 				end;
 			end;
-		until
-			not string.find(directoryName, '/');
-		
-		
-		end);
+		end;
 	end;
 	print'Successfully loaded AlphaLibrary.';
 end;
@@ -187,28 +189,37 @@ end);
 Engine:AddEnvironmentPage('GetDirectory', function(module_Directory)
 	assert(module_Directory ~= nil, 'function Engine:AddEnvironmentPage"GetDirectory": module_Directory is invalid');
 	assert(type(module_Directory) == 'string', 'function Engine:AddEnvironmentPage"GetDirectory": module_Directory is not a string');
-	
-	if (module_Directory:sub(1, 1) == '/' ~= nil) then
+
+	if (module_Directory:sub(1, 1) == '/') then
 		--/haha/json.lua
 		local directoryName = module_Directory:sub(2);
 		local currentSub = 0;
+		local maxSubs = directoryName:len();
 		repeat
+			wait();
 			currentSub = currentSub + 1;
 		until
-			directoryName:sub(currentSub, currentSub) == '/';
-		directoryName = directoryName:sub(2, currentSub - 1);
-		return directoryName;
+			directoryName:sub(currentSub, currentSub) == '/' or currentSub == maxSubs;
+		directoryName = directoryName:sub(1, currentSub - 1);
+		if (currentSub == maxSubs) then
+			return false, 'Cannot be found';
+		end;
+		return true, directoryName;
 	elseif (string.find(module_Directory, '/') ~= nil) then
 		--haha/json.lua
-		
 		local directoryName = module_Directory;
 		local currentSub = 0;
+		local maxSubs = directoryName:len();
 		repeat
+			wait();
 			currentSub = currentSub + 1;
 		until
-			directoryName:sub(currentSub, currentSub) == '/';
-		directoryName = directoryName:sub(2, currentSub - 1);
-		return directoryName;
+			directoryName:sub(currentSub, currentSub) == '/' or currentSub == maxSubs;
+		directoryName = directoryName:sub(1, currentSub - 1);
+		if (currentSub == maxSubs) then
+			return false, 'Cannot be found';
+		end;
+		return true, directoryName;
 	else
 		return false, 'Invalid_Directory';
 	end;
