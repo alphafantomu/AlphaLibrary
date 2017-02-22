@@ -20,7 +20,7 @@ function Engine:AddEnvironmentPage(index, value) Environment[index] = value; set
 
 assert(Engine.AddEnvironmentPage ~= nil, 'Engine:AddEnvironmentPage cannot be found');
 function Engine:Install_Library(Installed_Environment)
-	assert(Http.HttpEnabled, 'Engine: Http requests are not enabled');
+	--assert(Http.HttpEnabled, 'Engine: Http requests are not enabled');
 	
 	local RawRepository = 'https://raw.githubusercontent.com';
 	local SafeRepository = 'https://github.com';
