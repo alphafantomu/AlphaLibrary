@@ -10,24 +10,23 @@ Run = game:service'RunService';
 PhysicalLibrary = game:WaitForChild('AlphaLibrary', 10);
 Environment = getfenv(1);
 
-assert(script ~= nil, 'script "AlphaLibrary" cannot be found');
 assert(Library ~= nil, 'table "Library" cannot be found');
 assert(RepStorage ~= nil, 'service "ReplicatedStorage" cannot be found');
 assert(Http ~= nil, 'service "HttpService" cannot be found');
 assert(Run ~= nil, 'service "RunService" cannot be found');
 assert(Environment ~= nil, 'script "Environment" cannot be found');
 assert(PhysicalLibrary ~= nil, 'Physical Library "AlphaLibrary" cannot be found');
-assert(script.Name == 'AlphaLibrary', 'Custom Library "AlphaLibrary" is not named AlphaLibrary.');
-assert(script.ClassName == 'ModuleScript', 'Custom Library "AlphaLibrary" is not a Module Script.');
-assert(script.Parent == RepStorage, 'Custom Library "AlphaLibrary" is not the parent of ReplicatedStorage.');
-
+if (script) then
+	assert(script.Name == 'AlphaLibrary', 'Custom Library "AlphaLibrary" is not named AlphaLibrary.');
+	assert(script.ClassName == 'ModuleScript', 'Custom Library "AlphaLibrary" is not a Module Script.');
+	assert(script.Parent == RepStorage, 'Custom Library "AlphaLibrary" is not the parent of ReplicatedStorage.');
+end;
 function Library:AddEnvironmentPage(index, value) Environment[index] = value; setfenv(1, Environment); Environment = getfenv(1); end;
 
 assert(Library.AddEnvironmentPage ~= nil, 'Library:AddEnvironmentPage cannot be found');
 function Library:LoadLibrary(Library, Level)
 	assert(Library ~= nil, 'function Library:LoadLibrary: Library is invalid');
 	assert(Level ~= nil, 'function Library:LoadLibrary: Level is invalid');
-	(function() if (IsNot(Level, {0, 1}) == true) then Library:LoadLibrary(Library, 0);return;end;end)();
 	local LibraryDirectory = (function() if (Level == 0) then return PhysicalLibrary:FindFirstChild(Library, true); elseif (Level == 1) then return Library; end; end)();
 	assert(LibraryDirectory ~= nil, 'function Library:LoadLibrary: Library cannot be found');
 	assert(ConfirmClass(LibraryDirectory, 'ModuleScript'), 'function Library:LoadLibrary: Library is not a ModuleScript');
