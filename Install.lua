@@ -3,7 +3,7 @@
 	Install.lua is ment to be used by loadstring()
 --]]
 wait();
-local script, Install, RepStorage, Http, Environment, Run, Respository;
+local script, Install, RepStorage, Http, Environment, Run, Respository,isPlugin;
 
 script = script;
 Install = setmetatable({}, {__metatable = 'Invalid access'});
@@ -12,13 +12,19 @@ Http = game:service'HttpService';
 Run = game:service'RunService';
 Environment = getfenv(1);
 Repository = '/alphafantomu/AlphaLibrary';
+isPlugin = (function()if (plugin == nil) then return false;else return true;end;end)();
 
+assert(isPlugin ~= nil, 'variable "isPlugin" cannot be found');
 assert(Repository ~= nil, 'httpURL "Repository" cannot be found');
 assert(Install ~= nil, 'script "Install" cannot be found');
 assert(RepStorage ~= nil, 'service "ReplicatedStorage" cannot be found');
 assert(Http ~= nil, 'service "HttpService" cannot be found');
 assert(Run ~= nil, 'service "RunService" cannot be found');
 assert(Environment ~= nil, 'script "Environment" cannot be found');
+
+if (isPlugin == false) then
+	Http.HttpEnabled = true;	
+end;
 
 function Install:AddEnvironmentPage(index, value) Environment[index] = value; setfenv(1, Environment); Environment = getfenv(1); end;
 
