@@ -1,4 +1,12 @@
 
+--[[
+	[
+		"lol",
+		"lole"
+	]
+	
+	
+--]]
 wait();
 local Engine, RepStorage, Http, Environment, Run;
 
@@ -180,8 +188,19 @@ Engine:AddEnvironmentPage('GetDirectory', function(module_Directory)
 	assert(module_Directory ~= nil, 'function Engine:AddEnvironmentPage"GetDirectory": module_Directory is invalid');
 	assert(type(module_Directory) == 'string', 'function Engine:AddEnvironmentPage"GetDirectory": module_Directory is not a string');
 	
-	if (string.find(module_Directory, '/') ~= nil) then
-		--/ haha/json.lua
+	if (module_Directory:sub(1, 1) == '/' ~= nil) then
+		--/haha/json.lua
+		local directoryName = module_Directory:sub(2);
+		local currentSub = 0;
+		repeat
+			currentSub = currentSub + 1;
+		until
+			directoryName:sub(currentSub, currentSub) == '/';
+		directoryName = directoryName:sub(2, currentSub - 1);
+		return directoryName;
+	elseif (string.find(module_Directory, '/') ~= nil) then
+		--haha/json.lua
+		
 		local directoryName = module_Directory;
 		local currentSub = 0;
 		repeat
