@@ -27,7 +27,7 @@ function Install:CreateEngine()
 	assert(Http.HttpEnabled, 'Install: Http requests are not enabled');
 	local EngineLua = '/master/App/AlphaEngine.lua';
 	local RawRepository = 'https://raw.githubusercontent.com';
-	assert(Http:GetAsync(RawRepository..RawRepository..EngineLua, true) ~= nil, 'Install: "AlphaEngine.lua" has an invalid format');
+	--assert(Http:GetAsync(RawRepository..RawRepository..EngineLua, true) ~= nil, 'Install: "AlphaEngine.lua" has an invalid format');
 	local Engine = Create(
 		'ModuleScript', 
 		{
