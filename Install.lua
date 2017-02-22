@@ -1,6 +1,10 @@
 
 --[[
 	Install.lua is ment to be used by loadstring()
+	loadstring(game.HttpService:GetAsync('https://raw.githubusercontent.com/alphafantomu/AlphaLibrary/master/Install.lua', false))()
+	local Http = game:service'HttpService';
+	local Install = 'https://raw.githubusercontent.com/alphafantomu/AlphaLibrary/master/Install.lua';
+	loadstring(Http:GetAsync(Install))();
 --]]
 wait();
 local script, Install, RepStorage, Http, Environment, Run, Respository,isPlugin;
@@ -34,6 +38,9 @@ function Install:CreateEngine()
 	local EngineLua = '/master/App/AlphaEngine.lua';
 	local RawRepository = 'https://raw.githubusercontent.com';
 	assert(Http:GetAsync(RawRepository..Repository..EngineLua, true) ~= nil, 'Install: "AlphaEngine.lua" has an invalid format');
+	if (RepStorage:FindFirstChild'AlphaEngine') then
+		RepStorage:FindFirstChild'AlphaEngine':Destroy();
+	end;
 	local Engine = Create(
 		'ModuleScript', 
 		{
