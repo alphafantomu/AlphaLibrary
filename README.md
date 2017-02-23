@@ -4,7 +4,7 @@ contain code for the server and client, which is intended to support game develo
 
 ## Features 
 * **Simple Loading** - AlphaLibrary can be easily used and installed.
-  * Can be easily installed, just paste [Installer code]() into studio command bar.
+  * Can be easily installed, just paste [Installer code](https://raw.githubusercontent.com/alphafantomu/AlphaLibrary/master/Install.lua) into studio command bar.
   * Loader only contains 65 lines!
 * **Require to-load** - Libaries will not load unless, requested to. This won't impact game performance.
 * **Built for Roblox** - Made specifically for Roblox.
