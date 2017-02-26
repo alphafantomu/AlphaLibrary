@@ -1,14 +1,16 @@
 
 wait();
-local Engine, RepStorage, Http, Environment, Run;
+local Engine, RepStorage, Http, Environment, Run, ScriptStorage;
 
 Engine = setmetatable({}, {__metatable = 'Invalid access'});
 RepStorage = game:service'ReplicatedStorage';
 Http = game:service'HttpService';
 Run = game:service'RunService';
+ScriptStorage = game:service'ServerScriptService';
 Environment = getfenv(1);
 Repository = '/alphafantomu/AlphaLibrary';
 
+assert(ScriptStorage ~= nil, 'service "ServerScriptService" cannot be found');
 assert(Repository ~= nil, 'httpURL "Repository" cannot be found');
 assert(RepStorage ~= nil, 'service "ReplicatedStorage" cannot be found');
 assert(Engine ~= nil, 'script "Engine" cannot be found');
@@ -20,7 +22,7 @@ function Engine:AddEnvironmentPage(index, value) Environment[index] = value; set
 
 assert(Engine.AddEnvironmentPage ~= nil, 'Engine:AddEnvironmentPage cannot be found');
 function Engine:Install_Library(Installed_Environment)
-	--assert(Http.HttpEnabled, 'Engine: Http requests are not enabled');
+	assert(Http.HttpEnabled, 'Engine: Http requests are not enabled');
 	
 	local RawRepository = 'https://raw.githubusercontent.com';
 	local SafeRepository = 'https://github.com';
@@ -32,8 +34,9 @@ function Engine:Install_Library(Installed_Environment)
 	if (RepStorage:FindFirstChild('AlphaLibrary', true) ~= nil) then
 		RepStorage:FindFirstChild('AlphaLibrary', true):Destroy();
 	end;
-	if (game:FindFirstChild'AlphaLibrary' ~= nil) then
-		game['AlphaLibrary']:Destroy();
+	
+	if (ScriptStorage:FindFirstChild'AlphaLibrary' ~= nil) then
+		ScriptStorage['AlphaLibrary']:Destroy();
 	end;
 	
 	local Library = Create(
@@ -51,7 +54,7 @@ function Engine:Install_Library(Installed_Environment)
 		{
 			Name = 'AlphaLibrary',
 			Archivable = true,
-			Parent = game
+			Parent = ScriptStorage
 		}
 	);
 	
