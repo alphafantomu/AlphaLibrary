@@ -52,7 +52,7 @@ function Engine:Install_Library(Installed_Environment)
 		{
 			Name = 'AlphaLibrary',
 			Archivable = true,
-			Parent = ScriptStorage
+			Parent = game
 		}
 	);
 	
